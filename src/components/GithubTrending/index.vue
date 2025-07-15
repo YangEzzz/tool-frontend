@@ -16,12 +16,12 @@ const error = ref<string | null>(null)
 const fetchTrendingProjects = async () => {
   isLoading.value = true
   error.value = null
-  
+
   try {
     // 在实际项目中，这里应该调用fetchGithubTrending API
     // 目前使用模拟数据
     const response = await getMockGithubTrending(timeRange.value)
-    
+
     if (response.code === 200 && response.data) {
       trendingProjects.value = response.data
     } else {
@@ -50,10 +50,8 @@ onMounted(() => {
 <template>
   <div class="bg-card border rounded-lg p-4 h-full flex flex-col">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold flex items-center">
-        <span class="mr-2">🔥</span> GitHub热门项目
-      </h2>
-      
+      <h2 class="text-xl font-bold flex items-center"><span class="mr-2">🔥</span> GitHub热门项目</h2>
+
       <Select v-model="timeRange" @update:model-value="handleTimeRangeChange">
         <SelectTrigger class="w-[120px]">
           <SelectValue placeholder="时间范围" />
@@ -65,7 +63,7 @@ onMounted(() => {
         </SelectContent>
       </Select>
     </div>
-    
+
     <div v-if="isLoading" class="space-y-4">
       <div v-for="i in 2" :key="i" class="flex items-center space-x-4">
         <Skeleton class="h-10 w-10 rounded-full" />
@@ -75,22 +73,17 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    
+
     <div v-else-if="error" class="text-destructive p-4 rounded-md bg-destructive/10">
       <p>{{ error }}</p>
-      <button 
-        class="mt-2 text-sm underline hover:text-destructive/80" 
-        @click="fetchTrendingProjects"
-      >
-        重试
-      </button>
+      <button class="mt-2 text-sm underline hover:text-destructive/80" @click="fetchTrendingProjects">重试</button>
     </div>
-    
+
     <div v-else class="space-y-4 flex-1 overflow-auto">
-      <a 
-        v-for="project in trendingProjects" 
+      <a
+        v-for="project in trendingProjects"
         :key="`${project.id}`"
-        :href="project.url" 
+        :href="project.url"
         target="_blank"
         rel="noopener noreferrer"
         class="flex items-start p-3 hover:bg-accent rounded-md transition-colors w-full"
@@ -102,33 +95,30 @@ onMounted(() => {
               {{ project.title }}
             </h3>
           </div>
-          
+
           <p class="text-sm text-muted-foreground line-clamp-2 mt-1">
             {{ project.extra.desc }}
           </p>
-          
+
           <div class="flex items-center mt-2 text-xs text-muted-foreground w-full">
-            <span 
-              v-if="project.extra.codeLang"
-              class="flex items-center mr-3"
-            >
-              <span 
-                class="inline-block w-3 h-3 rounded-full mr-1" 
+            <span v-if="project.extra.codeLang" class="flex items-center mr-3">
+              <span
+                class="inline-block w-3 h-3 rounded-full mr-1"
                 :style="{ backgroundColor: project.extra.codeColor }"
               ></span>
               {{ project.extra.codeLang }}
             </span>
-            
+
             <span class="flex items-center mr-3">
               <Star class="w-3.5 h-3.5 mr-1" />
               {{ project.extra.star }}
             </span>
-            
+
             <span class="flex items-center mr-3">
               <GitFork class="w-3.5 h-3.5 mr-1" />
               {{ project.extra.fork }}
             </span>
-            
+
             <span class="flex items-center ml-auto">
               <TrendingUp class="w-3.5 h-3.5 mr-1" />
               {{ project.extra.todayStar }} stars today

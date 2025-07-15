@@ -22,12 +22,12 @@ const switchVariants = cva(
     variants: {
       variant: {
         default: 'data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
-        destructive: 'data-[state=checked]:bg-destructive data-[state=unchecked]:bg-input',
-      },
+        destructive: 'data-[state=checked]:bg-destructive data-[state=unchecked]:bg-input'
+      }
     },
     defaultVariants: {
-      variant: 'default',
-    },
+      variant: 'default'
+    }
   }
 )
 
@@ -37,12 +37,12 @@ const thumbVariants = cva(
     variants: {
       variant: {
         default: '',
-        destructive: '',
-      },
+        destructive: ''
+      }
     },
     defaultVariants: {
-      variant: 'default',
-    },
+      variant: 'default'
+    }
   }
 )
 
@@ -65,9 +65,6 @@ const thumbClass = computed(() => {
     @click="toggle"
     :class="switchClass"
   >
-    <span
-      :data-state="checked ? 'checked' : 'unchecked'"
-      :class="thumbClass"
-    />
+    <span :data-state="checked ? 'checked' : 'unchecked'" :class="thumbClass" />
   </button>
-</template> 
+</template>

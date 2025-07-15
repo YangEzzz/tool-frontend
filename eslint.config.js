@@ -6,7 +6,7 @@ import eslint from '@eslint/js'
 
 export default [
   {
-    ignores: ['node_modules', 'dist', 'public', 'src/components/ui/**']
+    ignores: ['node_modules', 'dist', 'public', 'src/components/ui/**', 'build/**']
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -53,6 +53,9 @@ export default [
    */
   {
     files: ['**/*.{ts,tsx,vue}'],
-    rules: {}
+    rules: {
+      // 允许any
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
   }
 ]

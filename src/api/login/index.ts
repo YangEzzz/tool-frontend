@@ -1,5 +1,10 @@
 import { api } from '@/request'
-import type { LoginRequestType, RegisterRequestType, LoginResponseType, RegisterResponseType } from '@/api/login/types.ts'
+import type {
+  LoginRequestType,
+  RegisterRequestType,
+  LoginResponseType,
+  RegisterResponseType
+} from '@/api/login/types.ts'
 
 /**
  * 用户登录
@@ -23,7 +28,6 @@ export const register = async (data: RegisterRequestType) => {
     url: '/user/register',
     data
   })
-  
 }
 
 /**
@@ -35,19 +39,18 @@ export const logout = async () => {
     const result = await api.post({
       url: '/user/logout'
     })
-    
+
     // 导入resetRouter函数并重置路由
     const { resetRouter } = await import('@/router')
     await resetRouter()
-    
+
     return result
   } catch (error) {
     // 即使API调用失败，也执行路由重置
     const { resetRouter } = await import('@/router')
     await resetRouter()
-    
+
     // 继续抛出错误，让调用方处理
     throw error
   }
 }
-

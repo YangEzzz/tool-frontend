@@ -1,6 +1,5 @@
 import { api } from '@/request'
 import type { MenuItem } from './types'
-import type { ResponseData } from '@/request'
 
 /**
  * 获取当前用户的菜单列表
@@ -23,4 +22,4 @@ export const fetchAllMenus = async () => {
 }
 
 // 重新导出类型
-export * from './types' 
+export * from './types'

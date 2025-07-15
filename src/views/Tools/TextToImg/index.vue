@@ -29,14 +29,14 @@ const sizeOptions = [
   { label: '800 x 600', width: 800, height: 600 },
   { label: '1024 x 768', width: 1024, height: 768 },
   { label: '1280 x 720', width: 1280, height: 720 },
-  { label: '1920 x 1080', width: 1920, height: 1080 },
+  { label: '1920 x 1080', width: 1920, height: 1080 }
 ]
 
 // 图片格式选项
 const formatOptions = [
   { value: 'png', label: 'PNG' },
   { value: 'jpeg', label: 'JPEG' },
-  { value: 'webp', label: 'WebP' },
+  { value: 'webp', label: 'WebP' }
 ]
 
 // 字体选项
@@ -52,7 +52,7 @@ const fontOptions = [
 
 // 处理尺寸选择
 const handleSizeChange = (sizeString: string) => {
-  const [w, h] = sizeString.split('x').map(s => parseInt(s.trim(), 10))
+  const [w, h] = sizeString.split('x').map((s) => parseInt(s.trim(), 10))
   width.value = w
   height.value = h
 }
@@ -164,9 +164,13 @@ const downloadImage = () => {
 }
 
 // 监听所有参数变化，实时更新图片
-watch([text, width, height, format, fontSize, fontColor, backgroundColor, fontFamily], () => {
-  generateImageWithDebounce()
-}, { deep: true })
+watch(
+  [text, width, height, format, fontSize, fontColor, backgroundColor, fontFamily],
+  () => {
+    generateImageWithDebounce()
+  },
+  { deep: true }
+)
 
 // 组件挂载时生成一次初始图片
 onMounted(() => {
@@ -191,13 +195,7 @@ onMounted(() => {
           <div class="space-y-4">
             <div>
               <Label for="text-input">文字内容</Label>
-              <Textarea
-                id="text-input"
-                v-model="text"
-                placeholder="输入要转为图片的文字..."
-                class="mt-1"
-                rows="4"
-              />
+              <Textarea id="text-input" v-model="text" placeholder="输入要转为图片的文字..." class="mt-1" rows="4" />
             </div>
 
             <div>
@@ -219,7 +217,11 @@ onMounted(() => {
                     <SelectValue placeholder="选择尺寸" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem v-for="option in sizeOptions" :key="option.label" :value="`${option.width} x ${option.height}`">
+                    <SelectItem
+                      v-for="option in sizeOptions"
+                      :key="option.label"
+                      :value="`${option.width} x ${option.height}`"
+                    >
                       {{ option.label }}
                     </SelectItem>
                   </SelectContent>
@@ -229,25 +231,11 @@ onMounted(() => {
               <div v-else class="grid grid-cols-2 gap-2">
                 <div>
                   <Label for="custom-width">宽度</Label>
-                  <Input
-                    id="custom-width"
-                    v-model="width"
-                    type="number"
-                    min="1"
-                    max="3000"
-                    class="mt-1"
-                  />
+                  <Input id="custom-width" v-model="width" type="number" min="1" max="3000" class="mt-1" />
                 </div>
                 <div>
                   <Label for="custom-height">高度</Label>
-                  <Input
-                    id="custom-height"
-                    v-model="height"
-                    type="number"
-                    min="1"
-                    max="3000"
-                    class="mt-1"
-                  />
+                  <Input id="custom-height" v-model="height" type="number" min="1" max="3000" class="mt-1" />
                 </div>
               </div>
             </div>
@@ -269,14 +257,7 @@ onMounted(() => {
 
               <div>
                 <Label for="font-size">字体大小</Label>
-                <Input
-                  id="font-size"
-                  v-model="fontSize"
-                  type="number"
-                  min="10"
-                  max="100"
-                  class="mt-1"
-                />
+                <Input id="font-size" v-model="fontSize" type="number" min="10" max="100" class="mt-1" />
               </div>
             </div>
 
@@ -298,38 +279,20 @@ onMounted(() => {
               <div>
                 <Label for="font-color">字体颜色</Label>
                 <div class="flex mt-1">
-                  <input
-                    v-model="fontColor"
-                    type="color"
-                    class="w-10 h-10 rounded-md cursor-pointer"
-                  />
-                  <Input
-                    v-model="fontColor"
-                    class="ml-2 flex-1"
-                  />
+                  <input v-model="fontColor" type="color" class="w-10 h-10 rounded-md cursor-pointer" />
+                  <Input v-model="fontColor" class="ml-2 flex-1" />
                 </div>
               </div>
               <div>
                 <Label for="bg-color">背景颜色</Label>
                 <div class="flex mt-1">
-                  <input
-                    v-model="backgroundColor"
-                    type="color"
-                    class="w-10 h-10 rounded-md cursor-pointer"
-                  />
-                  <Input
-                    v-model="backgroundColor"
-                    class="ml-2 flex-1"
-                  />
+                  <input v-model="backgroundColor" type="color" class="w-10 h-10 rounded-md cursor-pointer" />
+                  <Input v-model="backgroundColor" class="ml-2 flex-1" />
                 </div>
               </div>
             </div>
 
-            <Button
-              class="w-full"
-              :disabled="isGenerating"
-              @click="generateImage"
-            >
+            <Button class="w-full" :disabled="isGenerating" @click="generateImage">
               {{ isGenerating ? '正在生成...' : '刷新图片' }}
             </Button>
           </div>
@@ -345,15 +308,9 @@ onMounted(() => {
           <div class="flex flex-col h-full justify-center items-center">
             <div v-if="imageUrl" class="w-full">
               <div class="flex justify-center mb-4">
-                <img
-                  :src="imageUrl"
-                  alt="生成的图片"
-                  class="max-w-full max-h-[400px] object-contain border rounded"
-                />
+                <img :src="imageUrl" alt="生成的图片" class="max-w-full max-h-[400px] object-contain border rounded" />
               </div>
-              <Button class="w-full" variant="outline" @click="downloadImage">
-                下载图片
-              </Button>
+              <Button class="w-full" variant="outline" @click="downloadImage"> 下载图片 </Button>
             </div>
             <div v-else class="text-center text-muted-foreground p-8">
               <p>图片预览区域</p>

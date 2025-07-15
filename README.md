@@ -1,8 +1,11 @@
 # Vue 3 + TypeScript + Vite
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3
+`<script setup>` SFCs, check out the
+[script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+Learn more about the recommended Project Setup and IDE Support in the
+[Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
 
 # 聚合工具项目
 
@@ -145,7 +148,7 @@ if (importFn) {
     {
       "id": 3,
       "name": "用户列表",
-      "path": "list",  // 注意这里没有前导斜杠
+      "path": "list", // 注意这里没有前导斜杠
       "component": "List",
       "icon": null,
       "permissionCode": null,

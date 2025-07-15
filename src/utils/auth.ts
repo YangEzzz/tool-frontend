@@ -29,4 +29,4 @@ export const removeToken = (): void => {
  */
 export const isLoggedIn = (): boolean => {
   return !!getToken()
-} 
+}

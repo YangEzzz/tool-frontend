@@ -53,4 +53,4 @@ export const deletePasteById = async (id: number): Promise<PasteResponse> => {
   return api.delete<null>({
     url: `/pastes/remove/${id}`
   })
-} 
+}

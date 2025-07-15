@@ -1,11 +1,11 @@
 import { api } from '@/request'
-import type { 
-  UserInfo, 
-  UserListResponse, 
-  UserInfoResponse, 
-  UserQueryParams, 
-  RoleInfo, 
-  RoleListResponse, 
+import type {
+  UserInfo,
+  UserListResponse,
+  UserInfoResponse,
+  UserQueryParams,
+  RoleInfo,
+  RoleListResponse,
   UpdateUserRoleParams,
   CommonResponse
 } from './types'
@@ -27,11 +27,11 @@ export const getUserInfo = async (): Promise<UserInfoResponse> => {
  */
 export const getUserList = async (params: UserQueryParams): Promise<UserListResponse> => {
   return api.get<{
-    list: UserInfo[];
+    list: UserInfo[]
     pagination: {
-      current: number;
-      pageSize: number;
-      total: number;
+      current: number
+      pageSize: number
+      total: number
     }
   }>({
     url: '/user/list',
@@ -55,7 +55,7 @@ export const getRoleList = async (): Promise<RoleListResponse> => {
  * @returns 更新结果
  */
 export const updateUserRole = async (params: UpdateUserRoleParams): Promise<CommonResponse> => {
-  return api.post<{ success: boolean; message: string; }>({
+  return api.post<{ success: boolean; message: string }>({
     url: '/user/update-role',
     data: params
   })
@@ -68,10 +68,10 @@ export const updateUserRole = async (params: UpdateUserRoleParams): Promise<Comm
  */
 export const deleteUser = async (id: number): Promise<CommonResponse> => {
   return api.post<{
-    success: boolean;
-    message: string;
+    success: boolean
+    message: string
   }>({
     url: '/user/delete',
     data: { id }
   })
-} 
+}

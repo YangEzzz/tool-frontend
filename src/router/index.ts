@@ -71,26 +71,26 @@ const initStore = async () => {
 router.beforeEach(async (to, _, next) => {
   // 检查当前路由是否为公共路由
   const isPublicRoute = publicRoutes.includes(to.path)
-  
+
   // 如果用户已登录但动态路由尚未初始化
   if (isLoggedIn() && !hasInitRoutes) {
     try {
       // 获取权限store
       const permissionStore = await initStore()
-      
+
       // 获取用户菜单
       const response = await fetchUserMenus()
-      
+
       if (response.code === 200 && response.data) {
         // 设置菜单数据
         permissionStore.setMenus(response.data)
-        
+
         // 生成并添加动态路由
         permissionStore.addRoutes()
-        
+
         // 标记路由已初始化
         hasInitRoutes = true
-        
+
         // 如果访问的是根路径，重定向到首页
         if (to.path === '/') {
           next({ path: '/dashboard', replace: true })
@@ -104,7 +104,7 @@ router.beforeEach(async (to, _, next) => {
       console.error('初始化路由失败:', error)
     }
   }
-  
+
   // 如果不是公共路由且用户未登录，则重定向到登录页
   if (!isPublicRoute && !isLoggedIn()) {
     next({

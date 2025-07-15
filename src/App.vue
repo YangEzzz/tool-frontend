@@ -7,5 +7,4 @@ import { Toaster } from '@/components/ui/sonner'
   <Toaster rich-colors />
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

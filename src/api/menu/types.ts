@@ -9,4 +9,4 @@ export interface MenuItem {
   icon: string | null
   permissionCode: string | null
   children: MenuItem[]
-} 
+}

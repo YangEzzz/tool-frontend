@@ -38,7 +38,7 @@ const stats = ref([
     </div>
     <!-- GitHub热门项目 -->
     <div class="mt-6 flex-1 overflow-hidden">
-        <GithubTrending />
+      <GithubTrending />
     </div>
   </div>
 </template>

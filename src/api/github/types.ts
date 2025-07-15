@@ -22,7 +22,7 @@ export interface GithubTrendingResponse {
 }
 
 export enum GithubSince {
-  TODAY= 'daily',
+  TODAY = 'daily',
   WEEKLY = 'weekly',
   MONTHLY = 'monthly'
 }
