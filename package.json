@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
+    "@tanstack/vue-table": "^8.21.3",
     "@vee-validate/zod": "^4.15.0",
     "@vueuse/components": "^13.1.0",
     "@vueuse/core": "^13.1.0",
