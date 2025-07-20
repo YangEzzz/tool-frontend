@@ -16,15 +16,50 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-// import { fetchAllMenus, createMenu, updateMenu, deleteMenu } from '@/api/menu'
+import { fetchAllMenus, createMenu, updateMenu, deleteMenu } from '@/api/menu'
 import type { MenuItem, CreateMenuRequest } from '@/api/menu/types'
 import { MoreHorizontal, Plus, Edit, Trash2, FolderTree } from 'lucide-vue-next'
+import { Switch } from '@/components/ui/switch'
+import {
+  NumberField,
+  NumberFieldContent,
+  NumberFieldDecrement,
+  NumberFieldIncrement,
+  NumberFieldInput
+} from '@/components/ui/number-field'
+import {
+  AlertDialog,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogContent
+} from '@/components/ui/alert-dialog'
+
+const roleMap = [
+  {
+    id: 1,
+    name: '用户'
+  },
+  {
+    id: 2,
+    name: '管理员'
+  },
+  {
+    id: 3,
+    name: '超级管理员'
+  }
+]
 
 // 响应式数据
 const menus = ref<MenuItem[]>([])
 const loading = ref(false)
 const dialogOpen = ref(false)
 const editingMenu = ref<MenuItem | null>(null)
+const showDeleteDialog = ref(false)
+const menuToDelete = ref<MenuItem | null>(null)
 
 // 表单数据
 const formData = ref<CreateMenuRequest>({
@@ -32,7 +67,9 @@ const formData = ref<CreateMenuRequest>({
   path: '',
   component: '',
   icon: '',
-  permissionCode: '',
+  sort: 0,
+  visible: true,
+  permission_code: [],
   parentId: 0
 })
 
@@ -65,7 +102,7 @@ const flatMenus = computed(() => {
 
 // 计算属性：可选择的父菜单列表
 const parentMenuOptions = computed(() => {
-  const options: Array<{ value: number | null; label: string }> = [{ value: null, label: '无父菜单（顶级菜单）' }]
+  const options: Array<{ value: number | null; label: string }> = [{ value: 0, label: '无父菜单（顶级菜单）' }]
 
   const addOptions = (items: MenuItem[], prefix = '') => {
     items.forEach((item) => {
@@ -89,85 +126,8 @@ const fetchMenus = async () => {
   try {
     loading.value = true
     // 暂时使用模拟数据，因为接口可能还没有实现
-    // const response = await fetchAllMenus()
-    // menus.value = response.data || []
-
-    // 模拟数据
-    menus.value = [
-      {
-        id: 4,
-        name: '控制台',
-        path: '/dashboard',
-        component: 'Dashboard',
-        icon: 'dashboard',
-        permissionCode: 'dashboard',
-        children: []
-      },
-      {
-        id: 1,
-        name: '常用工具',
-        path: '/tool',
-        component: '',
-        icon: '',
-        permissionCode: '',
-        children: [
-          {
-            id: 9,
-            name: '占位图',
-            path: '/textToImg',
-            component: 'Tools/TextToImg',
-            icon: '',
-            permissionCode: '',
-            children: []
-          },
-          {
-            id: 3,
-            name: '表单生成器',
-            path: '/form',
-            component: 'Tools/FormGenerator',
-            icon: '',
-            permissionCode: '',
-            children: []
-          },
-          {
-            id: 10,
-            name: '多语言json处理',
-            path: '/i18Json',
-            component: 'Tools/I18nJson',
-            icon: '',
-            permissionCode: '',
-            children: []
-          },
-          {
-            id: 6,
-            name: '剪贴板',
-            path: '/paste',
-            component: 'Tools/Paste',
-            icon: 'team',
-            permissionCode: 'role:view',
-            children: []
-          }
-        ]
-      },
-      {
-        id: 5,
-        name: '用户管理',
-        path: '/users',
-        component: 'UserManagement',
-        icon: 'user',
-        permissionCode: 'user:view',
-        children: []
-      },
-      {
-        id: 7,
-        name: '菜单管理',
-        path: '/menus',
-        component: 'MenuManagement',
-        icon: 'menu',
-        permissionCode: 'menu:view',
-        children: []
-      }
-    ]
+    const response = await fetchAllMenus()
+    menus.value = response.data || []
   } catch (error) {
     console.error('获取菜单列表失败:', error)
     toast.error('获取菜单列表失败')
@@ -183,7 +143,9 @@ const resetForm = () => {
     path: '',
     component: '',
     icon: '',
-    permissionCode: '',
+    permission_code: [],
+    sort: 0,
+    visible: true,
     parentId: 0
   }
   editingMenu.value = null
@@ -203,29 +165,12 @@ const openEditDialog = (menu: MenuItem) => {
     path: menu.path,
     component: menu.component,
     icon: menu.icon,
-    permissionCode: menu.permissionCode,
-    parentId: getParentId(menu.id)
+    sort: menu.sort,
+    visible: menu.visible,
+    permission_code: menu.permission_code,
+    parentId: menu.parentId
   }
   dialogOpen.value = true
-}
-
-// 获取菜单的父ID
-const getParentId = (menuId: number): number => {
-  const findParent = (items: MenuItem[], targetId: number): number => {
-    for (const item of items) {
-      if (item.children.some((child) => child.id === targetId)) {
-        return item.id
-      }
-
-      const parentId = findParent(item.children, targetId)
-      if (parentId !== null) {
-        return parentId
-      }
-    }
-    return 0
-  }
-
-  return findParent(menus.value, menuId)
 }
 
 // 保存菜单
@@ -240,15 +185,17 @@ const saveMenu = async () => {
 
     // 模拟保存操作
     await new Promise((resolve) => setTimeout(resolve, 1000))
-
+    console.log(formData.value, 'formData')
     if (editingMenu.value) {
-      // 模拟更新菜单
-      toast.success('菜单更新成功（模拟）')
+      await updateMenu({
+        ...formData.value,
+        id: editingMenu.value.id
+      })
+      toast.success('菜单更新成功')
     } else {
-      // 模拟创建菜单
-      toast.success('菜单创建成功（模拟）')
+      await createMenu(formData.value)
+      toast.success('菜单创建成功')
     }
-
     dialogOpen.value = false
     await fetchMenus()
   } catch (error) {
@@ -260,16 +207,12 @@ const saveMenu = async () => {
 }
 
 // 删除菜单
-const handleDeleteMenu = async (menu: MenuItem) => {
-  if (!confirm(`确定要删除菜单"${menu.name}"吗？`)) {
-    return
-  }
-
+const handleDeleteMenu = async () => {
   try {
     loading.value = true
     // 模拟删除操作
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    toast.success('菜单删除成功（模拟）')
+    await deleteMenu(menuToDelete.value!.id)
+    toast.success('菜单删除成功')
     await fetchMenus()
   } catch (error) {
     console.error('删除菜单失败:', error)
@@ -277,6 +220,11 @@ const handleDeleteMenu = async (menu: MenuItem) => {
   } finally {
     loading.value = false
   }
+}
+
+const closeDeleteDialog = () => {
+  menuToDelete.value = null
+  showDeleteDialog.value = false
 }
 
 // 组件挂载时获取数据
@@ -317,6 +265,8 @@ onMounted(() => {
                 <TableHead>路径</TableHead>
                 <TableHead>组件</TableHead>
                 <TableHead>图标</TableHead>
+                <TableHead>排序值</TableHead>
+                <TableHead>可见性</TableHead>
                 <TableHead>权限代码</TableHead>
                 <TableHead>父菜单</TableHead>
                 <TableHead class="text-right">操作</TableHead>
@@ -334,7 +284,7 @@ onMounted(() => {
               <TableRow v-else-if="flatMenus.length === 0">
                 <TableCell colspan="7" class="text-center py-8 text-muted-foreground"> 暂无菜单数据 </TableCell>
               </TableRow>
-              <TableRow v-for="menu in flatMenus" v-else :key="menu.id">
+              <TableRow v-for="menu in flatMenus" v-else :key="menu.id" :class="menu.level > 0 && 'bg-muted'">
                 <TableCell>
                   <div class="flex items-center gap-2" :style="{ paddingLeft: `${menu.level * 20}px` }">
                     <span v-if="menu.level > 0" class="text-muted-foreground">└─</span>
@@ -354,8 +304,16 @@ onMounted(() => {
                   <span v-else class="text-muted-foreground">-</span>
                 </TableCell>
                 <TableCell>
-                  <code v-if="menu.permissionCode" class="bg-muted px-2 py-1 rounded text-sm">{{
-                    menu.permissionCode
+                  <code v-if="menu.sort" class="bg-muted px-2 py-1 rounded text-sm">{{ menu.sort }}</code>
+                  <span v-else class="text-muted-foreground">-</span>
+                </TableCell>
+                <TableCell>
+                  <Switch v-if="menu.visible !== undefined" v-model:checked="menu.visible" />
+                  <span v-else class="text-muted-foreground">-</span>
+                </TableCell>
+                <TableCell>
+                  <code v-if="menu.permission_code" class="bg-muted px-2 py-1 rounded text-sm">{{
+                    menu.permission_code
                   }}</code>
                   <span v-else class="text-muted-foreground">-</span>
                 </TableCell>
@@ -377,7 +335,12 @@ onMounted(() => {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         class="flex items-center gap-2 text-destructive focus:text-destructive"
-                        @click="handleDeleteMenu(menu)"
+                        @click="
+                          () => {
+                            menuToDelete = menu
+                            showDeleteDialog = true
+                          }
+                        "
                       >
                         <Trash2 class="h-4 w-4" />
                         删除
@@ -427,15 +390,37 @@ onMounted(() => {
             <Input id="icon" v-model="formData.icon" placeholder="如：dashboard" class="col-span-3" />
           </div>
 
+          <!-- 排序值 -->
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="sort" class="text-right">排序值</Label>
+            <NumberField id="sort" v-model="formData.sort" class="col-span-3">
+              <NumberFieldContent>
+                <NumberFieldDecrement />
+                <NumberFieldInput />
+                <NumberFieldIncrement />
+              </NumberFieldContent>
+            </NumberField>
+          </div>
+
+          <!-- 可见性 -->
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="visible" class="text-right">可见性</Label>
+            <Switch v-model:checked="formData.visible" />
+          </div>
+
           <!-- 权限代码 -->
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="permissionCode" class="text-right">权限代码</Label>
-            <Input
-              id="permissionCode"
-              v-model="formData.permissionCode"
-              placeholder="如：menu:view"
-              class="col-span-3"
-            />
+            <Label for="permission_code" class="text-right">权限代码</Label>
+            <Select v-model="formData.permission_code" multiple>
+              <SelectTrigger class="col-span-3">
+                <SelectValue placeholder="选择权限代码" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="role in roleMap" :key="role.id" :value="role.id">
+                  {{ role.name }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <!-- 父菜单 -->
@@ -462,6 +447,22 @@ onMounted(() => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <AlertDialog v-model:open="showDeleteDialog">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>确认删除菜单</AlertDialogTitle>
+          <AlertDialogDescription>
+            您确定要删除菜单 "{{ menuToDelete?.name }}" 吗？此操作不可撤销。
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel @click="closeDeleteDialog">取消</AlertDialogCancel>
+          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" @click="handleDeleteMenu">
+            删除
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 

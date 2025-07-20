@@ -44,7 +44,7 @@ interface MenuItem {
   path: string | null // 路由路径
   component: string | null // 组件路径
   icon: string | null // 图标名称
-  permissionCode: string | null // 权限代码
+  permission_code: string | null // 权限代码
   children: MenuItem[] // 子菜单列表
 }
 ```

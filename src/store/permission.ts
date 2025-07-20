@@ -92,7 +92,7 @@ export const usePermissionStore = defineStore('permission', {
           meta: {
             title: menu.name,
             icon: menu.icon,
-            permissions: menu.permissionCode ? [menu.permissionCode] : []
+            permissions: menu.permission_code ? [menu.permission_code] : []
           },
           children: [] // 初始化children数组
         }
@@ -116,7 +116,7 @@ export const usePermissionStore = defineStore('permission', {
               component: getComponent(menu.component),
               meta: {
                 title: menu.name,
-                permissions: menu.permissionCode ? [menu.permissionCode] : []
+                permissions: menu.permission_code ? [menu.permission_code] : []
               }
             }
           ]
@@ -147,7 +147,7 @@ export const usePermissionStore = defineStore('permission', {
           meta: {
             title: menu.name,
             icon: menu.icon,
-            permissions: menu.permissionCode ? [menu.permissionCode] : []
+            permissions: menu.permission_code ? [menu.permission_code] : []
           }
         }
 

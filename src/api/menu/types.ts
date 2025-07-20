@@ -7,7 +7,10 @@ export interface MenuItem {
   path: string
   component: string
   icon: string
-  permissionCode: string
+  sort: number
+  visible: boolean
+  parentId: number
+  permission_code: number[]
   children: MenuItem[]
 }
 
@@ -19,7 +22,9 @@ export interface CreateMenuRequest {
   path?: string
   component?: string
   icon?: string
-  permissionCode?: string
+  sort?: number
+  visible?: boolean
+  permission_code?: number[]
   parentId?: number
 }
 
@@ -32,7 +37,9 @@ export interface UpdateMenuRequest {
   path?: string
   component?: string
   icon?: string
-  permissionCode?: string
+  sort?: number
+  visible?: boolean
+  permission_code?: number[]
   parentId?: number
 }
 
@@ -43,4 +50,10 @@ export interface MenuResponse {
   code: number
   message: string
   data: MenuItem | MenuItem[]
+}
+
+export enum ROLE_TYPE {
+  USER = 1,
+  ADMIN,
+  SUPER_ADMIN
 }

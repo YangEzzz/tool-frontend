@@ -28,7 +28,7 @@ export const fetchAllMenus = async () => {
  */
 export const createMenu = async (data: CreateMenuRequest): Promise<MenuResponse> => {
   return api.post<MenuItem>({
-    url: '/menus/create',
+    url: '/menus/createMenus',
     data
   })
 }
@@ -39,8 +39,8 @@ export const createMenu = async (data: CreateMenuRequest): Promise<MenuResponse>
  * @returns 更新结果
  */
 export const updateMenu = async (data: UpdateMenuRequest): Promise<MenuResponse> => {
-  return api.put<MenuItem>({
-    url: `/menus/update/${data.id}`,
+  return api.post<MenuItem>({
+    url: `/menus/updateMenus`,
     data
   })
 }
@@ -51,8 +51,9 @@ export const updateMenu = async (data: UpdateMenuRequest): Promise<MenuResponse>
  * @returns 删除结果
  */
 export const deleteMenu = async (id: number): Promise<MenuResponse> => {
-  return api.delete<null>({
-    url: `/menus/delete/${id}`
+  return api.post({
+    url: `/menus/deleteMenus`,
+    data: { id }
   })
 }
 

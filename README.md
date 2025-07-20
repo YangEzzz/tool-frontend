@@ -27,7 +27,7 @@ Learn more about the recommended Project Setup and IDE Support in the
     "path": "/dashboard",
     "component": "Dashboard",
     "icon": "dashboard",
-    "permissionCode": "dashboard",
+    "permission_code": "dashboard",
     "children": []
   },
   {
@@ -36,7 +36,7 @@ Learn more about the recommended Project Setup and IDE Support in the
     "path": null,
     "component": null,
     "icon": null,
-    "permissionCode": null,
+    "permission_code": null,
     "children": [
       {
         "id": 7,
@@ -44,7 +44,7 @@ Learn more about the recommended Project Setup and IDE Support in the
         "path": "/paste",
         "component": "Paste",
         "icon": null,
-        "permissionCode": null,
+        "permission_code": null,
         "children": []
       }
     ]
@@ -91,7 +91,7 @@ if (importFn) {
   "path": null,
   "component": null,
   "icon": null,
-  "permissionCode": null,
+  "permission_code": null,
   "children": [
     {
       "id": 7,
@@ -99,7 +99,7 @@ if (importFn) {
       "path": "/paste",
       "component": "Tools/Paste",
       "icon": null,
-      "permissionCode": null,
+      "permission_code": null,
       "children": []
     }
   ]
@@ -117,7 +117,7 @@ if (importFn) {
   "path": "/users",
   "component": "Users",
   "icon": "user",
-  "permissionCode": "user:view",
+  "permission_code": "user:view",
   "children": [
     {
       "id": 3,
@@ -125,7 +125,7 @@ if (importFn) {
       "path": "/users/list",
       "component": "UserList",
       "icon": null,
-      "permissionCode": null,
+      "permission_code": null,
       "children": []
     }
   ]
@@ -143,7 +143,7 @@ if (importFn) {
   "path": "/users",
   "component": "Users",
   "icon": "user",
-  "permissionCode": "user:view",
+  "permission_code": "user:view",
   "children": [
     {
       "id": 3,
@@ -151,7 +151,7 @@ if (importFn) {
       "path": "list", // 注意这里没有前导斜杠
       "component": "List",
       "icon": null,
-      "permissionCode": null,
+      "permission_code": null,
       "children": []
     }
   ]
@@ -185,7 +185,7 @@ Layout组件将后端菜单数据转换为前端UI格式进行渲染。
 
 ### 7. 权限控制
 
-通过菜单中的`permissionCode`属性进行权限控制，未授权的菜单项不会显示，未授权的路由访问会被重定向到404页面。
+通过菜单中的`permission_code`属性进行权限控制，未授权的菜单项不会显示，未授权的路由访问会被重定向到404页面。
 
 ## 技术栈
 
