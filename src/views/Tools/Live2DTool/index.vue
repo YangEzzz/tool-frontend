@@ -1,6 +1,263 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { nextTick, ref } from 'vue'
+import Live2D from '@/views/Tools/Live2DTool/Components/Live2D.vue'
+const aspectRatio = ref(0.15)
+const angle = ref(0)
+// const uploadRef = ref()
+// const clearRef = ref()
+// const uploadProgress = ref({
+//   total: 0,
+//   loaded: 0
+// })
+const show = ref(true)
+const modelPath = ref('')
+// const fileList = ref([])
+const l2dRef = ref()
 
-<template>1</template>
+// const widthResize = ref()
+// const heightResize = ref()
+// const screen = ref()
+// const container = ref()
+const phoneType = ref('iPhone X')
+// const motionFileList = ref([])
+// const motionDrawer = ref(false)
+// const hitFrameVisible = ref(false)
+//
+// const l2dList = ref([])
+
+const phoneTypeMap = {
+  'iPhone 6/7/8 Plus': { width: 414, height: 736, label: '414x736' },
+  'iPhone 6/7/8': { width: 375, height: 667, label: '375x667' },
+  'iPhone X': { width: 375, height: 812, label: '375x812' },
+  'iPhone 5/SE': { width: 320, height: 568, label: '320x568' },
+  'iPhone 4': { width: 320, height: 480, label: '320x480' },
+  'Pixel 7': { width: 412, height: 915, label: '412x915' },
+  'iPhone 12 Pro': { width: 390, height: 844, label: '390x844' },
+  'iPhone 14 Pro Max': { width: 430, height: 932, label: '430x932' },
+  'iPhone SE': { width: 375, height: 667, label: '375x667' },
+  'iPhone XR': { width: 414, height: 896, label: '414x896' },
+  'Pixel 4': { width: 353, height: 745, label: '353x745' },
+  'Galaxy S9+': { width: 320, height: 658, label: '320x658' },
+  'OnePlus 10T': { width: 412, height: 915, label: '412x915' }
+}
+
+const nowWidth = ref(375)
+const nowHeight = ref(812)
+const isDragging = ref(false)
+const iPhoneRef = ref()
+
+// 拖拽调整大小
+const startResize = (e: MouseEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+
+  isDragging.value = true
+  const startX = e.clientX
+  const startY = e.clientY
+  const startWidth = nowWidth.value
+  const startHeight = nowHeight.value
+
+  // 禁用transition防止拖动延迟
+  if (iPhoneRef.value) {
+    iPhoneRef.value.style.transition = 'none'
+  }
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (!isDragging.value) return
+
+    e.preventDefault()
+    const deltaX = e.clientX - startX
+    const deltaY = e.clientY - startY
+
+    const newWidth = Math.max(200, Math.min(500, startWidth + deltaX))
+    const newHeight = Math.max(200, Math.min(900, startHeight + deltaY))
+
+    // 直接更新DOM避免Vue响应式延迟
+    if (iPhoneRef.value) {
+      iPhoneRef.value.style.width = newWidth + 'px'
+      iPhoneRef.value.style.height = newHeight + 'px'
+    }
+
+    // 同步更新响应式数据
+    nowWidth.value = newWidth
+    nowHeight.value = newHeight
+  }
+
+  const onMouseUp = () => {
+    isDragging.value = false
+
+    // 恢复transition
+    if (iPhoneRef.value) {
+      iPhoneRef.value.style.transition = ''
+    }
+
+    document.removeEventListener('mousemove', onMouseMove)
+    document.removeEventListener('mouseup', onMouseUp)
+  }
+
+  document.addEventListener('mousemove', onMouseMove)
+  document.addEventListener('mouseup', onMouseUp)
+}
+
+// 快速调整大小
+const adjustSize = (deltaWidth: number, deltaHeight: number) => {
+  if (deltaWidth !== 0) {
+    nowWidth.value = Math.max(200, Math.min(500, nowWidth.value + deltaWidth))
+  }
+  if (deltaHeight !== 0) {
+    nowHeight.value = Math.max(200, Math.min(900, nowHeight.value + deltaHeight))
+  }
+}
+
+const changePhoneType = (value: keyof typeof phoneTypeMap) => {
+  console.log(value)
+  nowWidth.value = phoneTypeMap[value].width
+  nowHeight.value = phoneTypeMap[value].height
+  nextTick(() => {
+    // reset()
+  })
+}
+// const reset = () => {
+//   l2dRef.value.loading = true
+//   nextTick(async () => {
+//     try {
+//       await l2dRef.value.createNewModel()
+//     } catch (e) {}
+//     const motionManager = l2dRef.value.erosModel.model.internalModel.motionManager
+//     const motionGroups = []
+//
+//     const definitions = motionManager.definitions
+//
+//     for (const [group, motions] of Object.entries(definitions)) {
+//       motionGroups.push({
+//         name: group,
+//         motions:
+//           motions
+//             ?.map((motion, index) => ({
+//               file: motion.file || motion.File || '',
+//               error: motionManager.motionGroups[group]![index]! === null ? 'Failed to load' : undefined
+//             }))
+//             .filter((item) => item.file) || []
+//       })
+//     }
+//     motionDrawer.value = true
+//     motionFileList.value = motionGroups
+//     console.log(motionGroups)
+//   })
+// }
+
+// const clear = () => {
+//   l2dRef.value.loading = false
+//   fileList.value = []
+//   modelPath.value = ''
+//   l2dRef.value.deleteModel()
+//   motionDrawer.value = false
+//   motionFileList.value = []
+//   hitFrameVisible.value = false
+// }
+</script>
+
+<template>
+  <div class="h-[calc(100vh-4rem-1px)] p-4">
+    <div class="flex h-full gap-4">
+      <!-- iPhone Simulator Panel -->
+      <div class="flex justify-center items-center">
+        <div class="flex flex-col items-center gap-4">
+          <!-- iPhone模拟器 -->
+          <div
+            id="modelContainer"
+            ref="iPhoneRef"
+            class="border-2 border-black rounded-lg bg-white flex items-center justify-center relative overflow-hidden select-none"
+            :class="{ 'transition-all duration-200': !isDragging }"
+            :style="{
+              width: nowWidth + 'px',
+              height: nowHeight + 'px',
+              minWidth: '200px',
+              maxWidth: '500px',
+              minHeight: '200px',
+              maxHeight: '900px'
+            }"
+          >
+            <Live2D
+              v-if="show"
+              ref="l2dRef"
+              :asset-url="modelPath"
+              :params="{
+                aspectRatio,
+                angle: angle / 360,
+                anchor: {
+                  x: nowWidth,
+                  y: nowHeight
+                }
+              }"
+            />
+            <!-- 拖拽句柄 -->
+            <div
+              class="absolute bottom-0 right-0 w-5 h-5 cursor-nw-resize opacity-60 hover:opacity-100 transition-opacity flex items-center justify-center"
+              :class="{ 'opacity-100 bg-blue-500': isDragging, 'bg-gray-500': !isDragging }"
+              style="border-radius: 0 0 6px 0"
+              @mousedown="startResize"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="text-white">
+                <path d="M12 0L0 12H4L12 4V0Z" fill="currentColor" />
+                <path d="M12 8L8 12H12V8Z" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- 快速尺寸控制 -->
+          <div class="flex items-center gap-2 text-sm">
+            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(-10, 0)">W-</button>
+            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(10, 0)">W+</button>
+            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(0, -10)">H-</button>
+            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(0, 10)">H+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="flex flex-1 flex-col gap-4 p-4 border rounded-lg bg-white">
+        <div class="flex items-center gap-4">
+          <Label class="font-semibold min-w-[50px]">Width:</Label>
+          <Input v-model.number="nowWidth" type="number" class="flex-1" :min="200" :max="500" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <Label class="font-semibold min-w-[50px]">Height:</Label>
+          <Input v-model.number="nowHeight" type="number" class="flex-1" :min="200" :max="900" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <Label class="font-semibold min-w-[50px]">Preset:</Label>
+          <Select v-model="phoneType" @update:model-value="changePhoneType">
+            <SelectTrigger class="flex-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="(value, key) in phoneTypeMap" :key="key" :value="key">
+                {{ key }} ({{ value.label }})
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="text-sm text-gray-500 mt-4 p-3 bg-gray-50 rounded">
+          <p><strong>Current Size:</strong> {{ nowWidth }}×{{ nowHeight }}px</p>
+          <p class="mt-1"><strong>Controls:</strong></p>
+          <ul class="mt-1 text-xs space-y-1">
+            <li>• Drag corner handle to resize</li>
+            <li>• Use W+/W-/H+/H- buttons</li>
+            <li>• Type exact numbers above</li>
+            <li>• Select device presets</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped></style>
 

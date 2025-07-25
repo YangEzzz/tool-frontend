@@ -20,7 +20,7 @@ export default ({ mode, command }: ConfigEnv): UserConfig => {
       port: 5173,
       proxy: {
         '/api': {
-          target: 'http://localhost:3089',
+          target: 'https://api.team-tool.top',
           ws: false,
           changeOrigin: true
         }
