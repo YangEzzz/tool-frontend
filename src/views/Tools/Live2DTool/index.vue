@@ -2,10 +2,19 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { nextTick, ref } from 'vue'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { nextTick, ref, watch } from 'vue'
 import Live2D from '@/views/Tools/Live2DTool/Components/Live2D.vue'
-const aspectRatio = ref(0.15)
-const angle = ref(0)
+import { Button } from '@/components/ui/button'
+import { Slider } from '@/components/ui/slider'
+import { SliderRange, SliderTrack } from 'reka-ui'
+import { Switch } from '@/components/ui/switch'
+const aspectRatio = ref([0.15])
+const angle = ref([0])
+const anchor = ref({
+  x: [0.5],
+  y: [0.5]
+})
 // const uploadRef = ref()
 // const clearRef = ref()
 // const uploadProgress = ref({
@@ -17,16 +26,14 @@ const modelPath = ref('')
 // const fileList = ref([])
 const l2dRef = ref()
 
-// const widthResize = ref()
-// const heightResize = ref()
-// const screen = ref()
-// const container = ref()
 const phoneType = ref('iPhone X')
-// const motionFileList = ref([])
-// const motionDrawer = ref(false)
-// const hitFrameVisible = ref(false)
-//
-// const l2dList = ref([])
+const motionFileList = ref()
+const motionDrawer = ref(false)
+const hitFrameVisible = ref(false)
+const l2dList = ref([
+  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json',
+  'ddd'
+])
 
 const phoneTypeMap = {
   'iPhone 6/7/8 Plus': { width: 414, height: 736, label: '414x736' },
@@ -93,7 +100,7 @@ const startResize = (e: MouseEvent) => {
     if (iPhoneRef.value) {
       iPhoneRef.value.style.transition = ''
     }
-
+    reset()
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
   }
@@ -112,52 +119,61 @@ const adjustSize = (deltaWidth: number, deltaHeight: number) => {
   }
 }
 
-const changePhoneType = (value: keyof typeof phoneTypeMap) => {
+const changePhoneType = (value: any) => {
   console.log(value)
-  nowWidth.value = phoneTypeMap[value].width
-  nowHeight.value = phoneTypeMap[value].height
+  nowWidth.value = phoneTypeMap[value as keyof typeof phoneTypeMap].width
+  nowHeight.value = phoneTypeMap[value as keyof typeof phoneTypeMap].height
   nextTick(() => {
-    // reset()
+    reset()
   })
 }
-// const reset = () => {
-//   l2dRef.value.loading = true
-//   nextTick(async () => {
-//     try {
-//       await l2dRef.value.createNewModel()
-//     } catch (e) {}
-//     const motionManager = l2dRef.value.erosModel.model.internalModel.motionManager
-//     const motionGroups = []
-//
-//     const definitions = motionManager.definitions
-//
-//     for (const [group, motions] of Object.entries(definitions)) {
-//       motionGroups.push({
-//         name: group,
-//         motions:
-//           motions
-//             ?.map((motion, index) => ({
-//               file: motion.file || motion.File || '',
-//               error: motionManager.motionGroups[group]![index]! === null ? 'Failed to load' : undefined
-//             }))
-//             .filter((item) => item.file) || []
-//       })
-//     }
-//     motionDrawer.value = true
-//     motionFileList.value = motionGroups
-//     console.log(motionGroups)
-//   })
-// }
 
-// const clear = () => {
-//   l2dRef.value.loading = false
-//   fileList.value = []
-//   modelPath.value = ''
-//   l2dRef.value.deleteModel()
-//   motionDrawer.value = false
-//   motionFileList.value = []
-//   hitFrameVisible.value = false
-// }
+const reset = () => {
+  l2dRef.value.loading = true
+  nextTick(async () => {
+    try {
+      await l2dRef.value.createNewModel()
+    } catch (e) {
+      console.warn(e)
+    }
+    const motionManager = l2dRef.value.erosModel.model.internalModel.motionManager
+    const motionGroups = []
+
+    const definitions = motionManager.definitions
+
+    for (const [group, motions] of Object.entries(definitions)) {
+      console.log(motions)
+      motionGroups.push({
+        name: group,
+        motions: 'motions'
+        // motions
+        //   ?.map((motion, index) => ({
+        //     file: motion.file || motion.File || '',
+        //     error: motionManager.motionGroups[group]![index]! === null ? 'Failed to load' : undefined
+        //   }))
+        //   .filter((item) => item.file) || []
+      })
+    }
+    motionDrawer.value = true
+    motionFileList.value = motionGroups
+    console.log(motionGroups)
+  })
+}
+
+const clear = () => {
+  l2dRef.value.loading = false
+  // fileList.value = []
+  modelPath.value = ''
+  l2dRef.value.deleteModel()
+  motionDrawer.value = false
+  motionFileList.value = []
+  hitFrameVisible.value = false
+}
+
+watch(hitFrameVisible, (val) => {
+  console.log(val)
+  l2dRef.value?.erosModel?.setHitAreaFrames?.(val)
+})
 </script>
 
 <template>
@@ -186,11 +202,11 @@ const changePhoneType = (value: keyof typeof phoneTypeMap) => {
               ref="l2dRef"
               :asset-url="modelPath"
               :params="{
-                aspectRatio,
-                angle: angle / 360,
+                aspectRatio: aspectRatio[0],
+                angle: angle[0] / 360,
                 anchor: {
-                  x: nowWidth,
-                  y: nowHeight
+                  x: anchor.x[0],
+                  y: anchor.y[0]
                 }
               }"
             />
@@ -201,7 +217,7 @@ const changePhoneType = (value: keyof typeof phoneTypeMap) => {
               style="border-radius: 0 0 6px 0"
               @mousedown="startResize"
             >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="text-white">
+              <svg width="12" height="12" viewBox="0 0 12 12" class="text-white">
                 <path d="M12 0L0 12H4L12 4V0Z" fill="currentColor" />
                 <path d="M12 8L8 12H12V8Z" fill="currentColor" />
               </svg>
@@ -220,40 +236,179 @@ const changePhoneType = (value: keyof typeof phoneTypeMap) => {
 
       <!-- Controls Panel -->
       <div class="flex flex-1 flex-col gap-4 p-4 border rounded-lg bg-white">
-        <div class="flex items-center gap-4">
-          <Label class="font-semibold min-w-[50px]">Width:</Label>
-          <Input v-model.number="nowWidth" type="number" class="flex-1" :min="200" :max="500" />
-        </div>
+        <Tabs default-value="model" class="w-full" :unmount-on-hide="false">
+          <TabsList class="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="model"> 模型选择 </TabsTrigger>
+            <TabsTrigger value="params"> 模型参数设置 </TabsTrigger>
+          </TabsList>
+          <TabsContent value="model">
+            <div class="mb-4 flex gap-x-4">
+              <Button>上传模型</Button>
+              <Button @click="clear">清空模型</Button>
+              <Button @click="reset">渲染模型</Button>
+            </div>
+            <div class="flex items-center gap-2 mb-4">
+              <Label class="shrink-0">链接:</Label>
+              <Input v-model="modelPath"></Input>
+            </div>
+            <div class="w-full flex items-center gap-4">
+              <Label class="shrink-0">模型列表:</Label>
+              <Select class="w-full">
+                <SelectTrigger class="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent class="w-full">
+                  <SelectItem v-for="item in l2dList" :key="item" :value="item">
+                    {{ item }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </TabsContent>
+          <TabsContent value="params" class="flex flex-col gap-y-4">
+            <div class="flex gap-x-4 w-full">
+              <div class="flex items-center gap-4 flex-1">
+                <Label class="font-semibold shrink-0">屏幕宽:</Label>
+                <Input v-model.number="nowWidth" type="number" class="flex-1" :min="200" :max="500" />
+              </div>
 
-        <div class="flex items-center gap-4">
-          <Label class="font-semibold min-w-[50px]">Height:</Label>
-          <Input v-model.number="nowHeight" type="number" class="flex-1" :min="200" :max="900" />
-        </div>
+              <div class="flex items-center gap-4 flex-1">
+                <Label class="font-semibold shrink-0">屏幕高:</Label>
+                <Input v-model.number="nowHeight" type="number" class="flex-1" :min="200" :max="900" />
+              </div>
+            </div>
 
-        <div class="flex items-center gap-4">
-          <Label class="font-semibold min-w-[50px]">Preset:</Label>
-          <Select v-model="phoneType" @update:model-value="changePhoneType">
-            <SelectTrigger class="flex-1">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem v-for="(value, key) in phoneTypeMap" :key="key" :value="key">
-                {{ key }} ({{ value.label }})
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            <div class="flex items-center gap-4">
+              <Label class="font-semibold shrink-0">预设尺寸:</Label>
+              <Select v-model="phoneType" @update:model-value="changePhoneType">
+                <SelectTrigger class="flex-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="(value, key) in phoneTypeMap" :key="key" :value="key">
+                    {{ key }} ({{ value.label }})
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div class="flex gap-x-4 w-full">
+              <Label class="font-semibold shrink-0">旋转角度:</Label>
+              <Input
+                v-model.number="angle[0]"
+                type="number"
+                class="flex-1"
+                :min="0"
+                :max="360"
+                :step="1"
+                :disabled="!Boolean(modelPath)"
+              />
+              <Slider
+                v-model="angle"
+                class="flex-1 shrink-0"
+                :min="0"
+                :max="360"
+                :step="1"
+                :disabled="!Boolean(modelPath)"
+              >
+                <SliderTrack>
+                  <SliderRange />
+                </SliderTrack>
+              </Slider>
+            </div>
+            <div class="flex gap-x-4 w-full">
+              <Label class="font-semibold shrink-0">缩放:</Label>
+              <Input
+                v-model.number="aspectRatio[0]"
+                type="number"
+                class="flex-1 shrink-0"
+                :min="0.01"
+                :max="4"
+                :step="0.01"
+                :disabled="!Boolean(modelPath)"
+              />
+              <Slider
+                v-model="aspectRatio"
+                class="flex-1 shrink-0"
+                :min="0.01"
+                :max="4"
+                :step="0.01"
+                :disabled="!Boolean(modelPath)"
+              >
+                <SliderTrack>
+                  <SliderRange />
+                </SliderTrack>
+              </Slider>
+            </div>
+            <div class="flex gap-x-4 w-full">
+              <Label class="font-semibold shrink-0">中心点位置:</Label>
+              <div class="flex flex-col gap-y-4 flex-1">
+                <div class="flex flex-1 gap-x-4">
+                  <Label>x轴</Label>
+                  <Input
+                    v-model.number="anchor.x[0]"
+                    type="number"
+                    class="flex-1 shrink-0"
+                    :min="0"
+                    :max="1"
+                    :step="0.01"
+                    :disabled="!Boolean(modelPath)"
+                  />
+                  <Slider
+                    v-model="anchor.x"
+                    class="flex-1 shrink-0"
+                    :min="0"
+                    :max="1"
+                    :step="0.01"
+                    :disabled="!Boolean(modelPath)"
+                  >
+                    <SliderTrack>
+                      <SliderRange />
+                    </SliderTrack>
+                  </Slider>
+                </div>
+                <div class="flex flex-1 gap-x-4">
+                  <Label>y轴</Label>
+                  <Input
+                    v-model.number="anchor.y[0]"
+                    type="number"
+                    class="flex-1 shrink-0"
+                    :min="0"
+                    :max="1"
+                    :step="0.01"
+                    :disabled="!Boolean(modelPath)"
+                  />
+                  <Slider
+                    v-model="anchor.y"
+                    class="flex-1 shrink-0"
+                    :min="0"
+                    :max="1"
+                    :step="0.01"
+                    :disabled="!Boolean(modelPath)"
+                  >
+                    <SliderTrack>
+                      <SliderRange />
+                    </SliderTrack>
+                  </Slider>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-x-4 w-full">
+              <Label>是否显示可触发区域</Label>
+              <Switch v-model:checked="hitFrameVisible" />
+            </div>
 
-        <div class="text-sm text-gray-500 mt-4 p-3 bg-gray-50 rounded">
-          <p><strong>Current Size:</strong> {{ nowWidth }}×{{ nowHeight }}px</p>
-          <p class="mt-1"><strong>Controls:</strong></p>
-          <ul class="mt-1 text-xs space-y-1">
-            <li>• Drag corner handle to resize</li>
-            <li>• Use W+/W-/H+/H- buttons</li>
-            <li>• Type exact numbers above</li>
-            <li>• Select device presets</li>
-          </ul>
-        </div>
+            <div class="text-sm text-gray-500 mt-4 p-3 bg-gray-50 rounded">
+              <p><strong>Current Size:</strong> {{ nowWidth }}×{{ nowHeight }}px</p>
+              <p class="mt-1"><strong>Controls:</strong></p>
+              <ul class="mt-1 text-xs space-y-1">
+                <li>• Drag corner handle to resize</li>
+                <li>• Use W+/W-/H+/H- buttons</li>
+                <li>• Type exact numbers above</li>
+                <li>• Select device presets</li>
+              </ul>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   </div>

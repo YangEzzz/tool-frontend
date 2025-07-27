@@ -18,7 +18,7 @@ const createNewModel = async () => {
   deleteModel()
   console.log(props.assetUrl, 'ssss')
   erosModel.value = new Live2dCreator({
-    modelJson: props.assetUrl.replace('http://154.196.245.64', 'http://frontend.yangezzz.top'),
+    modelJson: props.assetUrl,
     canvasID: 'live2d',
     containerID: 'modelContainer',
     params: {
