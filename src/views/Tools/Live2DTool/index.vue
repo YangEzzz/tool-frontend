@@ -180,7 +180,7 @@ watch(hitFrameVisible, (val) => {
   <div class="h-[calc(100vh-4rem-1px)] p-4">
     <div class="flex h-full gap-4">
       <!-- iPhone Simulator Panel -->
-      <div class="flex justify-center items-center">
+      <div class="flex justify-center items-start">
         <div class="flex flex-col items-center gap-4">
           <!-- iPhone模拟器 -->
           <div
@@ -239,7 +239,7 @@ watch(hitFrameVisible, (val) => {
         <Tabs default-value="model" class="w-full" :unmount-on-hide="false">
           <TabsList class="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="model"> 模型选择 </TabsTrigger>
-            <TabsTrigger value="params"> 模型参数设置 </TabsTrigger>
+            <TabsTrigger value="params" :disabled="!modelPath"> 模型参数设置 </TabsTrigger>
           </TabsList>
           <TabsContent value="model">
             <div class="mb-4 flex gap-x-4">
@@ -393,8 +393,12 @@ watch(hitFrameVisible, (val) => {
               </div>
             </div>
             <div class="flex gap-x-4 w-full">
-              <Label>是否显示可触发区域</Label>
+              <Label class="font-semibold shrink-0">是否显示可触发区域</Label>
               <Switch v-model:checked="hitFrameVisible" />
+            </div>
+            <div class="flex gap-x-4 w-full">
+              <Label class="font-semibold shrink-0">背景图片（用于首帧截图）</Label>
+              <Input type="file" />
             </div>
 
             <div class="text-sm text-gray-500 mt-4 p-3 bg-gray-50 rounded">
