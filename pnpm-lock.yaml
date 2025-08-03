@@ -35,6 +35,9 @@ importers:
       imagekit:
         specifier: ^6.0.0
         version: 6.0.0
+      live2d-motionsync:
+        specifier: ^0.0.4
+        version: 0.0.4
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2279,6 +2282,9 @@ packages:
   listr2@8.3.2:
     resolution: {integrity: sha512-vsBzcU4oE+v0lj4FhVLzr9dBTv4/fHIa57l+GCwovP8MoFNZJTOhGU8PXd4v2VJCbECAaijBiHntiekFMLvo0g==}
     engines: {node: '>=18.0.0'}
+
+  live2d-motionsync@0.0.4:
+    resolution: {integrity: sha512-H88M2o580DSoZYwaymTB/7DcHg1N6jna2OQ15ECShoYvVJLPqZ2zMqacB4+ZYupJb/Q4/lJfuXUT06K/vrVX/g==}
 
   locate-path@5.0.0:
     resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}
@@ -5233,6 +5239,8 @@ snapshots:
       log-update: 6.1.0
       rfdc: 1.4.1
       wrap-ansi: 9.0.0
+
+  live2d-motionsync@0.0.4: {}
 
   locate-path@5.0.0:
     dependencies:

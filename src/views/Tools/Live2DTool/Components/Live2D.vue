@@ -7,6 +7,8 @@ const props = withDefaults(
   defineProps<{
     params: any
     assetUrl: string
+    // eslint-disable-next-line vue/require-default-prop
+    bg?: string
   }>(),
   {}
 )

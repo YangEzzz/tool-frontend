@@ -1,18 +1,18 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import * as PIXI from 'pixi.js'
-import { InternalModel, Live2DModel, MotionPriority } from 'pixi-live2d-display'
-import { HitAreaFrames } from 'pixi-live2d-display/extra'
+import { InternalModel, Live2DModel, MotionPriority, SoundManager } from 'pixi-live2d-display'
+import { MotionSync } from 'live2d-motionsync'
+window.PIXI = PIXI
 
 interface ModelOption {
-  modelJson: string | File[]
+  modelJson: string
   canvasID: string
   autoInteract?: boolean
   containerID: string
   params?: {
-    aspectRatio: number
-    angle: number
-    anchor: {
+    scale?: number
+    rotate: number
+    anchor?: {
       x: number
       y: number
     }
@@ -23,7 +23,7 @@ export class Live2dCreator {
   modelOption: ModelOption
   static model: Live2DModel
   static app: PIXI.Application
-  static hitFrames
+  static motionSync: MotionSync
   json: {
     HitAreas: {
       Name: string
@@ -32,70 +32,63 @@ export class Live2dCreator {
     }[]
   }
   constructor(modelOption: ModelOption) {
-    window.PIXI = PIXI
-    if (window.erosModel) {
-      delete window.erosModel
-    }
     this.modelOption = modelOption
-    console.log(modelOption.modelJson, '1212')
+    if (window.erosModel) {
+      window.erosModel = undefined
+    }
   }
 
   async initModel(func: () => void) {
     // 引入模型
-    // const json = await fetch(this.modelOption.modelJson).then((res) => res.json())
-    // console.log(json)
-    // this.json = json
-    console.log(this.modelOption.modelJson, 'json')
+    const model = await Live2DModel.from(this.modelOption.modelJson, {
+      autoInteract: this.modelOption.autoInteract ?? true
+    })
+    window.erosModel = model
+    this.model = model
+    const motionSync = new MotionSync(model.internalModel)
     try {
-      const model = await Live2DModel.from(this.modelOption.modelJson, {
-        autoInteract: this.modelOption.autoInteract || true
-      })
-      window.erosModel = model
-      this.model = model
-      // 创建模型对象
-      PIXI.settings.RESOLUTION = 3
-      const app = new PIXI.Application({
-        view: document.getElementById(this.modelOption.canvasID),
-        autoStart: true,
-        resizeTo: document.getElementById(this.modelOption.containerID),
-        // 透明
-        backgroundColor: 0xffffff,
-        backgroundAlpha: 0
-      })
-      this.app = app
-      // 添加模型到舞台
-      app.stage.addChild(model)
-      // 模型的缩放
-      this.setScale(this.modelOption?.params?.aspectRatio)
-      model.anchor.set(this.modelOption?.params?.anchor.x, this.modelOption?.params?.anchor.y)
-      model.scale.set(this.modelOption.params.aspectRatio)
-      model.rotation = Math.PI * this.modelOption.params.angle * 2
-      // 模型的位置,x,y相较于窗口左上角
-      model.x = document.getElementById(this.modelOption.containerID).getBoundingClientRect().width / 2
-      model.y = document.getElementById(this.modelOption.containerID).getBoundingClientRect().height / 2
-
-      // // 添加模型状态管理器
-      model.InternalModel = new InternalModel(model)
-      const hitAreaFrames = new HitAreaFrames()
-
-      model.addChild(hitAreaFrames)
-
-      this.hitFrames = hitAreaFrames
-      hitAreaFrames.visible = false
-      func()
-      console.log(model)
-      this.model.internalModel.coreModel.setParameterValueById('Param47', 1)
-      this.model.internalModel.coreModel.setParameterValueById('Param54', 1)
-      this.model.internalModel.coreModel.setParameterValueById('Param57', 1)
-      this.model.internalModel.coreModel.setParameterValueById('Param59', 1)
-
-      this.registerDefaultTap()
-    } catch (e) {
-      console.warn(e)
+      await motionSync.loadDefaultMotionSync()
+      this.motionSync = motionSync
+    } catch {
+      console.warn('No MotionSync')
     }
+    // 创建模型对象
+    PIXI.settings.RESOLUTION = 3
+    const app = new PIXI.Application({
+      view: document.getElementById(this.modelOption.canvasID),
+      autoStart: true,
+      resizeTo: document.getElementById(this.modelOption.containerID),
+      // 透明
+      backgroundAlpha: 0
+    })
+    this.app = app
+    // 添加模型到舞台
+    let isRenderComplete = false
+    app.stage.addChild(model)
+    app.ticker.add(() => {
+      // 检查是否渲染完成
+      if (!isRenderComplete) {
+        if (model.visible) {
+          func()
+          isRenderComplete = true
+          // 一旦渲染完成，你可以停止或做其他处理
+        }
+      }
+    })
+    // 模型的缩放
+    model.scale.set(this.modelOption.params.scale || 0.15)
+    model.anchor.set(this.modelOption.params?.anchor?.x || 0.5, this.modelOption.params?.anchor?.y || 0.5)
+    model.rotation = Math.PI * this.modelOption.params.rotate * 2 || 0
+    // 模型的位置,x,y相较于窗口左上角
+    model.x = document.getElementById(this.modelOption.containerID).getBoundingClientRect().width / 2
+    model.y = document.getElementById(this.modelOption.containerID).getBoundingClientRect().height / 2
+
+    // // 添加模型状态管理器
+    model.InternalModel = new InternalModel(model)
+    // this.registerDefaultTap()
   }
 
-  setScale(scale: number) {
+  setScale(scale) {
     const targetArea =
       document.getElementById(this.modelOption.containerID).getBoundingClientRect().width *
       document.getElementById(this.modelOption.containerID).getBoundingClientRect().height
@@ -106,7 +99,7 @@ export class Live2dCreator {
     window.erosModel.y = document.getElementById(this.modelOption.canvasID).clientHeight / 2
   }
 
-  setAngle(angle: number) {
+  setAngle(angle) {
     window.erosModel.rotation = Math.PI * angle * 2
     window.erosModel.x = document.getElementById(this.modelOption.containerID).getBoundingClientRect().width / 2
     window.erosModel.y = document.getElementById(this.modelOption.containerID).getBoundingClientRect().height / 2
@@ -118,6 +111,10 @@ export class Live2dCreator {
     window.erosModel.y = document.getElementById(this.modelOption.containerID).getBoundingClientRect().height / 2
   }
 
+  setParameterValueById(id: string, value: number) {
+    this.model.internalModel.coreModel.setParameterValueById(id, value)
+  }
+
   registerHitEvent(func: (hitArea: string[]) => void) {
     try {
       window.erosModel.on('hit', func)
@@ -125,6 +122,7 @@ export class Live2dCreator {
       console.warn(e)
     }
   }
+
   registerDefaultTap() {
     try {
       window.erosModel.on('pointerdown', () => {
@@ -134,19 +132,30 @@ export class Live2dCreator {
       console.warn(e)
     }
   }
-  setHitAreaFrames(visible: boolean) {
-    console.log(visible)
-    this.hitFrames.visible = visible
-  }
-  motionTrigger(type, index = undefined, priority: MotionPriority = MotionPriority.FORCE) {
-    return window.erosModel.motion(type, index, priority)
-  }
 
-  setParameter() {
-    window.erosModel?.setParameterValueById('Param47', 1)
+  motionTrigger(type, index = 0, priority: MotionPriority = MotionPriority.FORCE) {
+    window.erosModel?.motion(type, index, priority)
   }
 
   expressionTrigger(type) {
-    window.erosModel.expression(type)
+    window.erosModel?.expression(type)
+  }
+
+  triggerMotionSync(url: string, func?: { onStop?: () => void }) {
+    console.log(1212121)
+    this.motionSync.reset()
+    this.motionSync.play(url).then((res) => {
+      console.log(res, '口型成功')
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      func?.onStop && func.onStop()
+    })
+  }
+
+  stopMotionSync() {
+    this?.motionSync?.reset()
+  }
+
+  destroySound() {
+    SoundManager.destroy()
   }
 }

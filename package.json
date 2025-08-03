@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "imagekit": "^6.0.0",
+    "live2d-motionsync": "^0.0.4",
     "lodash-es": "^4.17.21",
     "lucide-vue-next": "^0.503.0",
     "pinia": "^3.0.2",

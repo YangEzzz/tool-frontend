@@ -55,7 +55,8 @@ export default [
     files: ['**/*.{ts,tsx,vue}'],
     rules: {
       // 允许any
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off'
     }
   }
 ]

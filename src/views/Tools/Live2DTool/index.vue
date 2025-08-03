@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useFileDialog } from '@vueuse/core'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -21,19 +22,24 @@ const anchor = ref({
 //   total: 0,
 //   loaded: 0
 // })
+const { open, onChange } = useFileDialog({
+  accept: 'image/*' // Set to accept only image files
+})
+const onlineUrl = 'https://livco.me/api/uploads/live2d/?/model.json'
 const show = ref(true)
 const modelPath = ref('')
 // const fileList = ref([])
 const l2dRef = ref()
+const bgImage = ref('')
 
 const phoneType = ref('iPhone X')
 const motionFileList = ref()
 const motionDrawer = ref(false)
 const hitFrameVisible = ref(false)
-const l2dList = ref([
-  'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json',
-  'ddd'
-])
+// const l2dList = ref([
+//   'https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/haru/haru_greeter_t03.model3.json',
+//   'ddd'
+// ])
 
 const phoneTypeMap = {
   'iPhone 6/7/8 Plus': { width: 414, height: 736, label: '414x736' },
@@ -56,6 +62,17 @@ const nowHeight = ref(812)
 const isDragging = ref(false)
 const iPhoneRef = ref()
 
+onChange((files) => {
+  console.log(files)
+  if (files?.[0]) {
+    bgImage.value = URL.createObjectURL(files[0])
+  }
+})
+
+const addOnlineUrl = (val: Event) => {
+  const target = val.target as HTMLInputElement
+  modelPath.value = onlineUrl.replace('?', target.value)
+}
 // 拖拽调整大小
 const startResize = (e: MouseEvent) => {
   e.preventDefault()
@@ -200,7 +217,9 @@ watch(hitFrameVisible, (val) => {
             <Live2D
               v-if="show"
               ref="l2dRef"
+              :style="{ background: `url('${bgImage}') center / cover no-repeat` }"
               :asset-url="modelPath"
+              :bg="bgImage"
               :params="{
                 aspectRatio: aspectRatio[0],
                 angle: angle[0] / 360,
@@ -243,27 +262,28 @@ watch(hitFrameVisible, (val) => {
           </TabsList>
           <TabsContent value="model">
             <div class="mb-4 flex gap-x-4">
-              <Button>上传模型</Button>
               <Button @click="clear">清空模型</Button>
               <Button @click="reset">渲染模型</Button>
+              <Input placeholder="输入模型名称自动补全" @change="addOnlineUrl" />
+              <!--              <Button>上传模型</Button>-->
             </div>
             <div class="flex items-center gap-2 mb-4">
               <Label class="shrink-0">链接:</Label>
               <Input v-model="modelPath"></Input>
             </div>
-            <div class="w-full flex items-center gap-4">
-              <Label class="shrink-0">模型列表:</Label>
-              <Select class="w-full">
-                <SelectTrigger class="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent class="w-full">
-                  <SelectItem v-for="item in l2dList" :key="item" :value="item">
-                    {{ item }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <!--            <div class="w-full flex items-center gap-4">-->
+            <!--              <Label class="shrink-0">模型列表:</Label>-->
+            <!--              <Select class="w-full">-->
+            <!--                <SelectTrigger class="w-full">-->
+            <!--                  <SelectValue />-->
+            <!--                </SelectTrigger>-->
+            <!--                <SelectContent class="w-full">-->
+            <!--                  <SelectItem v-for="item in l2dList" :key="item" :value="item">-->
+            <!--                    {{ item }}-->
+            <!--                  </SelectItem>-->
+            <!--                </SelectContent>-->
+            <!--              </Select>-->
+            <!--            </div>-->
           </TabsContent>
           <TabsContent value="params" class="flex flex-col gap-y-4">
             <div class="flex gap-x-4 w-full">
@@ -398,7 +418,7 @@ watch(hitFrameVisible, (val) => {
             </div>
             <div class="flex gap-x-4 w-full">
               <Label class="font-semibold shrink-0">背景图片（用于首帧截图）</Label>
-              <Input type="file" />
+              <Button @click="open">上传图片</Button>
             </div>
 
             <div class="text-sm text-gray-500 mt-4 p-3 bg-gray-50 rounded">
