@@ -203,7 +203,7 @@ watch(hitFrameVisible, (val) => {
           <div
             id="modelContainer"
             ref="iPhoneRef"
-            class="border-2 border-black rounded-lg bg-white flex items-center justify-center relative overflow-hidden select-none"
+            class="border-2 border-black dark:border-white rounded-lg flex items-center justify-center relative overflow-hidden select-none"
             :class="{ 'transition-all duration-200': !isDragging }"
             :style="{
               width: nowWidth + 'px',
@@ -245,16 +245,30 @@ watch(hitFrameVisible, (val) => {
 
           <!-- 快速尺寸控制 -->
           <div class="flex items-center gap-2 text-sm">
-            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(-10, 0)">W-</button>
-            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(10, 0)">W+</button>
-            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(0, -10)">H-</button>
-            <button class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" @click="adjustSize(0, 10)">H+</button>
+            <button
+              class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300"
+              @click="adjustSize(-10, 0)"
+            >
+              W-
+            </button>
+            <button class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300" @click="adjustSize(10, 0)">
+              W+
+            </button>
+            <button
+              class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300"
+              @click="adjustSize(0, -10)"
+            >
+              H-
+            </button>
+            <button class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300" @click="adjustSize(0, 10)">
+              H+
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Controls Panel -->
-      <div class="flex flex-1 flex-col gap-4 p-4 border rounded-lg bg-white">
+      <div class="flex flex-1 flex-col gap-4 p-4 border rounded-lg">
         <Tabs default-value="model" class="w-full" :unmount-on-hide="false">
           <TabsList class="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="model"> 模型选择 </TabsTrigger>

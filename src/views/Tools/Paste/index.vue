@@ -458,22 +458,33 @@ const deletePaste = async (id: number) => {
 <template>
   <div class="flex flex-col py-4 px-4 overflow-hidden h-[calc(100vh-4rem-1px)]">
     <!-- 横向布局容器 -->
-    <div class="flex flex-col lg:flex-row gap-6 flex-1 overflow-hidden">
+    <div class="flex flex-col lg:flex-row gap-2 flex-1 overflow-hidden">
       <!-- 输入区域 -->
-      <Card class="mb-8 lg:mb-0 lg:w-2/5 lg:self-start">
-        <CardHeader>
-          <CardTitle class="text-3xl font-bold">剪贴板工具</CardTitle>
-          <CardDescription>在此输入您想保存的文本或图片内容</CardDescription>
+      <Card
+        class="mb-4 gap-1 lg:mb-0 lg:w-2/5 lg:self-start bg-card dark:bg-card border border-border dark:border-border shadow-sm dark:shadow-lg"
+      >
+        <CardHeader class="pb-3 sm:pb-4 lg:pb-6">
+          <CardTitle class="text-lg sm:text-xl lg:text-3xl font-bold text-foreground dark:text-foreground">
+            剪贴板工具
+          </CardTitle>
+          <CardDescription class="text-xs sm:text-sm lg:text-base text-muted-foreground dark:text-muted-foreground">
+            在此输入您想保存的文本或图片内容
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div class="space-y-4">
+        <CardContent class="p-3 sm:p-4 lg:p-6">
+          <div class="space-y-3 sm:space-y-4">
             <!-- 内容类型切换 -->
-            <div class="flex items-center space-x-4 mb-2">
+            <div class="flex items-center space-x-2 sm:space-x-4 mb-2">
               <Button
                 variant="outline"
                 size="sm"
-                :class="{ 'bg-primary text-primary-foreground': contentType === 'text' }"
+                :class="{
+                  'bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground':
+                    contentType === 'text',
+                  'border-border dark:border-border hover:bg-accent dark:hover:bg-accent': contentType !== 'text'
+                }"
                 :disabled="isSubmitting"
+                class="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                 @click="
                   () => {
                     contentType = 'text'
@@ -483,15 +494,15 @@ const deletePaste = async (id: number) => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="mr-2 h-4 w-4"
+                  class="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"
                 >
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
@@ -499,32 +510,39 @@ const deletePaste = async (id: number) => {
                   <line x1="16" y1="17" x2="8" y2="17"></line>
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
-                文本内容
+                <span class="hidden sm:inline">文本内容</span>
+                <span class="sm:hidden">文本</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                :class="{ 'bg-primary text-primary-foreground': contentType === 'image' }"
+                :class="{
+                  'bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground':
+                    contentType === 'image',
+                  'border-border dark:border-border hover:bg-accent dark:hover:bg-accent': contentType !== 'image'
+                }"
                 :disabled="isSubmitting"
+                class="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                 @click="contentType = 'image'"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="mr-2 h-4 w-4"
+                  class="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"
                 >
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
                   <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
-                图片内容
+                <span class="hidden sm:inline">图片内容</span>
+                <span class="sm:hidden">图片</span>
               </Button>
             </div>
 
@@ -533,16 +551,16 @@ const deletePaste = async (id: number) => {
               <Textarea
                 v-model="pasteContent"
                 placeholder="输入要保存的文本..."
-                class="min-h-32"
+                class="min-h-24 sm:min-h-32 text-sm sm:text-base bg-background dark:bg-background border-border dark:border-border text-foreground dark:text-foreground placeholder:text-muted-foreground dark:placeholder:text-muted-foreground"
                 :disabled="isSubmitting"
               />
             </div>
 
             <!-- 图片上传区域 -->
-            <div v-else class="flex flex-col space-y-4">
+            <div v-else class="flex flex-col space-y-3 sm:space-y-4">
               <!-- 图片预览区域 -->
               <div
-                class="border-2 border-dashed rounded-md p-4 min-h-32 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-colors"
+                class="border-2 border-dashed border-border dark:border-border rounded-md p-3 sm:p-4 min-h-24 sm:min-h-32 flex flex-col items-center justify-center cursor-pointer hover:border-primary dark:hover:border-primary transition-colors bg-background dark:bg-background"
                 @click="!isSubmitting && ($refs.imageUpload as HTMLInputElement)?.click()"
               >
                 <input
@@ -556,26 +574,37 @@ const deletePaste = async (id: number) => {
 
                 <!-- 有图片预览时 -->
                 <div v-if="imagePreview" class="w-full">
-                  <img :src="imagePreview" alt="预览图片" class="max-h-64 mx-auto rounded-md" />
+                  <img
+                    :src="imagePreview"
+                    alt="预览图片"
+                    class="max-h-48 sm:max-h-64 mx-auto rounded-md shadow-sm dark:shadow-lg"
+                  />
                   <div class="flex justify-end mt-2">
-                    <Button variant="destructive" size="sm" :disabled="isSubmitting" @click.stop="clearSelectedImage">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      :disabled="isSubmitting"
+                      class="text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
+                      @click.stop="clearSelectedImage"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
+                        width="14"
+                        height="14"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
                         stroke-width="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        class="mr-2 h-4 w-4"
+                        class="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"
                       >
                         <path d="M3 6h18"></path>
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                       </svg>
-                      移除图片
+                      <span class="hidden sm:inline">移除图片</span>
+                      <span class="sm:hidden">移除</span>
                     </Button>
                   </div>
                 </div>
@@ -584,30 +613,46 @@ const deletePaste = async (id: number) => {
                 <div v-else class="text-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
+                    width="32"
+                    height="32"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="1"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="mx-auto text-muted-foreground"
+                    class="mx-auto text-muted-foreground dark:text-muted-foreground sm:w-12 sm:h-12"
                   >
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                     <polyline points="21 15 16 10 5 21"></polyline>
                   </svg>
-                  <p class="mt-2 text-sm text-muted-foreground">点击选择图片或拖放图片到此处</p>
-                  <p class="text-xs text-muted-foreground">支持 JPG, PNG, GIF 等常见图片格式</p>
-                  <p class="text-xs text-muted-foreground">图片大小不超过 5MB</p>
+                  <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground dark:text-muted-foreground">
+                    <span class="hidden sm:inline">点击选择图片或拖放图片到此处</span>
+                    <span class="sm:hidden">点击选择图片</span>
+                  </p>
+                  <p class="text-xs text-muted-foreground dark:text-muted-foreground hidden sm:block">
+                    支持 JPG, PNG, GIF 等常见图片格式
+                  </p>
+                  <p class="text-xs text-muted-foreground dark:text-muted-foreground">图片大小不超过 5MB</p>
                 </div>
               </div>
             </div>
 
             <div class="flex items-center space-x-2">
-              <Switch id="public-mode" v-model:checked="isPublic" :disabled="isSubmitting" />
-              <Label html-for="public-mode">公开内容 (所有用户可见)</Label>
+              <Switch
+                id="public-mode"
+                v-model:checked="isPublic"
+                :disabled="isSubmitting"
+                class="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input"
+              />
+              <Label
+                html-for="public-mode"
+                class="text-xs sm:text-sm text-foreground dark:text-foreground cursor-pointer"
+              >
+                <span class="hidden sm:inline">公开内容 (所有用户可见)</span>
+                <span class="sm:hidden">公开内容</span>
+              </Label>
             </div>
           </div>
         </CardContent>
