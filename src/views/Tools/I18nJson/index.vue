@@ -68,9 +68,16 @@ const copyToClipboard = async (content: string, contentType: 'text' | 'image') =
         <Button class="mb-4" @click="getClipKey">粘贴</Button>
         <Textarea v-model="key" style="height: 600px" type="textarea" :row="10" placeholder="键名" />
       </div>
-      <div class="shrink-0 flex-1">
+      <div class="shrink-0 flex-1 overflow-hidden">
         <Button class="mb-4" @click="getClipValue">粘贴</Button>
-        <Textarea v-model="value" style="height: 600px" type="textarea" :row="10" placeholder="翻译" />
+        <Textarea
+          v-model="value"
+          class="whitespace-nowrap overflow-x-auto min-w-0"
+          style="height: 600px"
+          type="textarea"
+          :row="10"
+          placeholder="翻译"
+        />
       </div>
       <div class="shrink-0 flex flex-col justify-center gap-y-4">
         <Button @click="output">输出</Button>
