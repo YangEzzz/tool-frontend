@@ -431,6 +431,9 @@ watch(hitFrameVisible, (val) => {
               <Switch v-model:checked="hitFrameVisible" />
             </div>
             <div class="flex gap-x-4 w-full">
+              <Button @click="l2dRef?.erosModel?.stopAllMotion()">暂停动作</Button>
+            </div>
+            <div class="flex gap-x-4 w-full">
               <Label class="font-semibold shrink-0">背景图片（用于首帧截图）</Label>
               <Button @click="open">上传图片</Button>
             </div>

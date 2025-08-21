@@ -137,6 +137,12 @@ export class Live2dCreator {
     window.erosModel?.motion(type, index, priority)
   }
 
+  stopAllMotion() {
+    delete window.erosModel?.internalModel.motionManager.definitions['Idle']
+    window.erosModel?.internalModel.motionManager.stopAllMotions()
+    window.erosModel?.internalModel.focusController.focus(0, 0)
+  }
+
   expressionTrigger(type) {
     window.erosModel?.expression(type)
   }
